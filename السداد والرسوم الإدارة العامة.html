@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>متابعة الرسوم الدراسية — طلب السداد عبر واتساب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --royal:#2b1a6b;
+    --royal-2:#3d2a8a;
+    --royal-3:#1e1350;
+    --gold:#c9a227;
+    --gold-2:#e6c34a;
+    --gold-soft:#f5e6b8;
+    --bg:#f5f3fa;
+    --card:#ffffff;
+    --ink:#241a4a;
+    --muted:#6b6590;
+    --line:#e6e2f2;
+
+    --red:#7f1d1d; --red-2:#991b1b; --red-bg:#fee2e2;
+    --orange:#9a3412; --orange-2:#c2410c; --orange-bg:#ffedd5;
+    --yellow:#854d0e; --yellow-2:#a16207; --yellow-bg:#fef9c3;
+    --green:#14532d; --green-2:#15803d; --green-bg:#dcfce7;
+    --gray:#374151; --gray-2:#4b5563; --gray-bg:#e5e7eb;
+
+    --blue:#1d4ed8; --blue-bg:#dbeafe;
+    --teal:#0f766e; --teal-bg:#ccfbf1;
+    --purple:#7c3aed; --purple-bg:#ede9fe;
+
+    --shadow:0 4px 22px rgba(43,26,107,.10);
+    --shadow-gold:0 4px 22px rgba(201,162,39,.25);
+  }
+  *{box-sizing:border-box}
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    font-family:'Cairo','Segoe UI',Tahoma,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 400px at 100% 0%, rgba(201,162,39,.08), transparent 60%),
+      radial-gradient(1200px 400px at 0% 0%, rgba(43,26,107,.06), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    line-height:1.65;
+    font-size:15px;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  .wrap{max-width:1380px;margin:0 auto;padding:20px;width:100%;flex:1}
+
+  header{
+    background:linear-gradient(135deg,var(--royal-3) 0%, var(--royal) 45%, var(--royal-2) 100%);
+    color:#fff;padding:26px 24px;border-radius:16px;
+    box-shadow:var(--shadow), inset 0 0 0 1px rgba(201,162,39,.35);
+    position:relative;overflow:hidden;
+  }
+  header::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(135deg, rgba(201,162,39,.05) 0 2px, transparent 2px 14px);
+    pointer-events:none;
+  }
+  header::after{
+    content:"";position:absolute;left:-40px;bottom:-40px;width:200px;height:200px;border-radius:50%;
+    background:radial-gradient(circle, rgba(201,162,39,.25), transparent 70%);
+    pointer-events:none;
+  }
+  header h1{margin:0 0 8px;font-size:1.5rem;font-weight:800;letter-spacing:.2px;position:relative;z-index:1}
+  header h1::before{content:"👑 ";color:var(--gold-2)}
+  header p{margin:0;opacity:.92;font-size:.95rem;position:relative;z-index:1}
+  header .gold-line{height:3px;width:90px;margin-top:14px;border-radius:2px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-2),transparent);position:relative;z-index:1}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+  button{font-family:inherit;font-size:.92rem;border:none;border-radius:10px;padding:11px 18px;
+    cursor:pointer;transition:.18s;font-weight:700;letter-spacing:.2px}
+  button:active{transform:translateY(1px)}
+  button:disabled{opacity:.55;cursor:not-allowed;transform:none !important}
+  .btn-brand{background:linear-gradient(135deg,var(--royal),var(--royal-2));color:#fff;
+    box-shadow:var(--shadow);border:1px solid rgba(201,162,39,.55)}
+  .btn-brand:hover:not(:disabled){box-shadow:var(--shadow-gold);transform:translateY(-1px)}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));
+    color:var(--royal-3);box-shadow:var(--shadow-gold);border:1px solid rgba(255,255,255,.25)}
+  .btn-gold:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
+  .btn-ghost{background:#fff;color:var(--royal);border:1px solid var(--line)}
+  .btn-ghost:hover:not(:disabled){background:#faf7ff;border-color:var(--gold)}
+  .btn-green{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;
+    box-shadow:0 4px 14px rgba(22,163,74,.3)}
+  .btn-green:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
+  .btn-blue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;
+    box-shadow:0 4px 14px rgba(37,99,235,.3)}
+  .btn-blue:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
+  .btn-red{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;
+    box-shadow:0 4px 14px rgba(220,38,38,.3)}
+  .btn-red:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
+
+  .drop{border:2px dashed #c9c1e6;border-radius:14px;background:#fff;
+    padding:30px;text-align:center;color:var(--muted);transition:.2s;cursor:pointer;
+    box-shadow:var(--shadow)}
+  .drop.hover{border-color:var(--gold);background:var(--gold-soft);color:var(--royal)}
+  .drop strong{color:var(--ink);font-size:1.02rem;font-weight:800}
+  .drop .icon{font-size:2rem;display:block;margin-bottom:8px}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+  .stat{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);
+    border-right:5px solid var(--gold);position:relative;overflow:hidden;transition:.18s}
+  .stat:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(43,26,107,.20)}
+  .stat::after{content:"";position:absolute;top:0;left:0;width:60px;height:60px;
+    background:radial-gradient(circle, rgba(201,162,39,.10), transparent 70%);border-radius:0 0 60px 0}
+  .stat .label{font-size:.8rem;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:4px}
+  .stat .value{font-size:1.35rem;font-weight:800;margin-top:2px;color:var(--royal)}
+
+  .stat.c-blue{border-right-color:var(--blue);background:linear-gradient(180deg,var(--blue-bg),#fff)}
+  .stat.c-blue .value{color:var(--blue)}
+  .stat.c-gold{border-right-color:var(--gold);background:linear-gradient(180deg,#fff9e6,#fff)}
+  .stat.c-gold .value{color:#a16207}
+  .stat.c-gold .label::before{content:"✦ ";color:var(--gold)}
+  .stat.c-teal{border-right-color:var(--teal);background:linear-gradient(180deg,var(--teal-bg),#fff)}
+  .stat.c-teal .value{color:var(--teal)}
+  .stat.c-purple{border-right-color:var(--purple);background:linear-gradient(180deg,var(--purple-bg),#fff)}
+  .stat.c-purple .value{color:var(--purple)}
+
+  .stat.alert{
+    color:#fff;border-right:none;padding:16px 18px 12px;
+    position:relative;overflow:hidden;isolation:isolate;
+  }
+  .stat.alert .label{color:rgba(255,255,255,.92);font-size:.82rem;font-weight:700;
+    display:flex;align-items:center;gap:6px;}
+  .stat.alert .value{color:#fff;font-size:1.65rem;font-weight:900;margin-top:4px;
+    text-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .stat.alert::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:12px;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.18);}
+  .stat.alert .icon-bg{position:absolute;bottom:-10px;left:-10px;font-size:3.4rem;
+    opacity:.15;z-index:-1;line-height:1;pointer-events:none;}
+  .stat.alert .bar{margin-top:10px;height:6px;background:rgba(255,255,255,.22);
+    border-radius:999px;overflow:hidden;}
+  .stat.alert .bar > span{display:block;height:100%;background:rgba(255,255,255,.9);
+    border-radius:999px;transition:width .6s ease;}
+
+  .stat.alert.c-red{background:linear-gradient(135deg,var(--red) 0%, var(--red-2) 100%);
+    box-shadow:0 6px 24px rgba(127,29,29,.45);}
+  .stat.alert.c-red.pulse{animation:pulseRed 2s infinite;}
+  @keyframes pulseRed{
+    0%,100%{box-shadow:0 6px 24px rgba(127,29,29,.45)}
+    50%{box-shadow:0 6px 34px rgba(220,38,38,.75)}
+  }
+  .stat.alert.c-orange{background:linear-gradient(135deg,var(--orange) 0%, var(--orange-2) 100%);
+    box-shadow:0 6px 24px rgba(154,52,18,.42);}
+  .stat.alert.c-yellow{background:linear-gradient(135deg,var(--yellow) 0%, var(--yellow-2) 100%);
+    box-shadow:0 6px 24px rgba(133,77,14,.42);}
+  .stat.alert.c-green{background:linear-gradient(135deg,var(--green) 0%, var(--green-2) 100%);
+    box-shadow:0 6px 24px rgba(20,83,45,.42);}
+  .stat.alert.c-gray{background:linear-gradient(135deg,var(--gray) 0%, var(--gray-2) 100%);
+    box-shadow:0 6px 24px rgba(55,65,81,.42);}
+
+  .table-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;
+    border:1px solid rgba(201,162,39,.25)}
+  .table-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    background:linear-gradient(90deg,#fbf9ff,#fff 60%,#fff9e6)}
+  .table-head h2{margin:0;font-size:1.05rem;color:var(--royal);font-weight:800}
+  .table-head h2::before{content:"✦ ";color:var(--gold)}
+  .head-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1;justify-content:flex-end}
+  .search{flex:1;min-width:200px;max-width:340px}
+  .search input{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:10px;
+    font-family:inherit;font-size:.9rem;outline:none;background:#fff;transition:.15s;color:var(--ink)}
+  .search input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.18)}
+  .reset-sort{background:#fff;color:var(--royal);border:1px solid var(--line);
+    border-radius:10px;padding:9px 14px;font-size:.85rem;font-weight:700;cursor:pointer;
+    transition:.15s;display:inline-flex;align-items:center;gap:6px}
+  .reset-sort:hover{background:#faf7ff;border-color:var(--gold)}
+  .reset-sort:disabled{opacity:.5;cursor:not-allowed}
+
+  .table-scroll{overflow:auto;max-height:70vh;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:1150px}
+  thead th{
+    position:sticky;top:0;z-index:2;padding:12px 10px;text-align:right;font-weight:800;
+    white-space:nowrap;color:#fff;
+    background:linear-gradient(135deg,var(--royal),var(--royal-2));
+    border-bottom:2px solid var(--gold);
+    cursor:pointer;user-select:none;transition:background .15s;
+  }
+  thead th:hover{background:linear-gradient(135deg,var(--royal-2),#4a349e)}
+  thead th .sort-ind{display:inline-block;margin-right:6px;font-size:.75rem;opacity:.55;
+    transition:.15s;font-weight:900}
+  thead th.sorted-asc .sort-ind,
+  thead th.sorted-desc .sort-ind{opacity:1;color:var(--gold-2)}
+  thead th.no-sort{cursor:default}
+  thead th.no-sort:hover{background:linear-gradient(135deg,var(--royal),var(--royal-2))}
+
+  /* ================================================================
+     ✅ حل مضمون 100% — checkbox بعنصر <label> قابل للنقر
+     ================================================================ */
+  .check-col{text-align:center !important;width:46px;cursor:default !important}
+
+  .cbx{
+    position:relative;
+    display:inline-block;
+    width:22px;
+    height:22px;
+    cursor:pointer;
+    vertical-align:middle;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .cbx input{
+    position:absolute;
+    opacity:0;
+    width:0;height:0;
+    margin:0;padding:0;
+    pointer-events:none;
+  }
+  .cbx .box{
+    position:absolute;
+    inset:0;
+    border:2px solid #b9b2d6;
+    border-radius:5px;
+    background-color:#fff;
+    transition:background-color .15s, border-color .15s, box-shadow .15s, transform .1s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .cbx .box::after{
+    content:"";
+    display:block;
+    width:12px;
+    height:7px;
+    border-left:2.5px solid transparent;
+    border-bottom:2.5px solid transparent;
+    transform:rotate(-45deg) translate(1px,-1px);
+    transition:border-color .15s;
+  }
+  .cbx:hover .box{
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(201,162,39,.18);
+  }
+  .cbx input:focus-visible + .box{
+    box-shadow:0 0 0 3px rgba(201,162,39,.35);
+  }
+
+  /* ✅ عند التحديد (الصفوف) — بنفسجي مع صح بيضاء */
+  .cbx input:checked + .box{
+    background-color:var(--royal);
+    border-color:var(--royal);
+  }
+  .cbx input:checked + .box::after{
+    border-left-color:#fff;
+    border-bottom-color:#fff;
+  }
+
+  /* ✅ عند التحديد (رأس الجدول) — ذهبي مع صح بنفسجية داكنة */
+  .cbx.cbx-head input:checked + .box{
+    background-color:var(--gold-2);
+    border-color:var(--gold-2);
+  }
+  .cbx.cbx-head input:checked + .box::after{
+    border-left-color:var(--royal-3);
+    border-bottom-color:var(--royal-3);
+  }
+  .cbx.cbx-head .box{
+    border-color:rgba(255,255,255,.7);
+  }
+  .cbx.cbx-head:hover .box{
+    border-color:var(--gold-2);
+    box-shadow:0 0 0 3px rgba(230,195,74,.28);
+  }
+
+  /* ✅ حالة جزئية (indeterminate) — شرطة أفقية */
+  .cbx input:indeterminate + .box{
+    background-color:var(--gold-2);
+    border-color:var(--gold-2);
+  }
+  .cbx input:indeterminate + .box::after{
+    width:10px;
+    height:0;
+    border-left:0;
+    border-bottom:2.5px solid var(--royal-3);
+    transform:none;
+  }
+  /* ================================================================ */
+
+  tbody td{padding:10px;border-bottom:1px solid var(--line);white-space:nowrap;color:var(--ink)}
+  tbody tr{transition:background .12s}
+  tbody tr:nth-child(even){background:#fcfbff}
+  tbody tr:hover{background:#f7f2ff !important}
+  tbody tr.risk-red{background:var(--red-bg) !important}
+  tbody tr.risk-orange{background:var(--orange-bg) !important}
+  tbody tr.risk-yellow{background:var(--yellow-bg) !important}
+  tbody tr.risk-green{background:var(--green-bg) !important}
+  tbody tr.risk-gray{background:var(--gray-bg) !important;opacity:.85}
+  tbody tr.selected{outline:2px solid var(--gold);outline-offset:-2px;background:#fffbe8 !important}
+  tbody tr.sent td:nth-child(3)::after{
+    content:" ✓";color:var(--green-2);font-weight:900;font-size:1rem;
+  }
+
+  .money{font-variant-numeric:tabular-nums;font-weight:800;color:var(--royal)}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.75rem;
+    font-weight:800;letter-spacing:.2px}
+  .badge.red{background:var(--red-2);color:#fff}
+  .badge.orange{background:var(--orange-2);color:#fff}
+  .badge.yellow{background:var(--yellow-2);color:#fff}
+  .badge.green{background:var(--green-2);color:#fff}
+  .badge.gray{background:var(--gray-2);color:#fff}
+
+  .actions-cell{display:flex;gap:6px;align-items:center}
+  .btn-edit{
+    background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;
+    border-radius:8px;padding:8px 11px;font-size:.85rem;font-weight:800;
+    display:inline-flex;align-items:center;gap:4px;border:none;cursor:pointer;
+    box-shadow:0 2px 8px rgba(109,40,217,.3);transition:.15s;
+  }
+  .btn-edit:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(109,40,217,.4)}
+  .btn-edit svg{width:14px;height:14px;fill:#fff}
+
+  .btn-wa{color:#fff;border-radius:8px;padding:8px 13px;font-size:.85rem;
+    display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);font-weight:800;border:none;cursor:pointer;transition:.15s;
+    position:relative;}
+  .btn-wa svg{width:16px;height:16px;fill:#fff;flex-shrink:0}
+  .btn-wa.red{background:linear-gradient(135deg,#dc2626,#991b1b)}
+  .btn-wa.orange{background:linear-gradient(135deg,#ea580c,#c2410c)}
+  .btn-wa.yellow{background:linear-gradient(135deg,#ca8a04,#a16207)}
+  .btn-wa.green{background:linear-gradient(135deg,#16a34a,#15803d)}
+  .btn-wa.gray{background:linear-gradient(135deg,#6b7280,#4b5563);cursor:not-allowed;opacity:.8}
+  .btn-wa:not(.gray):hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.22)}
+  .btn-wa.sent{
+    background:linear-gradient(135deg,#0e7490,#155e75) !important;
+    box-shadow:0 0 0 2px var(--gold), 0 4px 14px rgba(14,116,144,.4) !important;
+  }
+  .btn-wa.sent:hover{filter:brightness(1.08)}
+  .btn-wa.sent::after{
+    content:"✓";position:absolute;top:-6px;left:-6px;
+    background:var(--gold);color:var(--royal-3);
+    width:18px;height:18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.7rem;font-weight:900;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);border:1.5px solid #fff;
+  }
+
+  .pager{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    padding:12px 18px;border-top:1px solid var(--line);
+    background:linear-gradient(90deg,#fbf9ff,#fff 60%,#fff9e6)}
+  .pager .info{font-size:.85rem;color:var(--muted);font-weight:700}
+  .pager .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .pager select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;
+    font-family:inherit;font-size:.85rem;background:#fff;color:var(--ink);font-weight:700;cursor:pointer}
+  .pager select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,162,39,.18)}
+  .pg-btn{
+    min-width:36px;height:36px;padding:0 10px;
+    border-radius:8px;border:1px solid var(--line);background:#fff;
+    color:var(--royal);font-weight:800;font-size:.85rem;cursor:pointer;
+    transition:.15s;display:inline-flex;align-items:center;justify-content:center;
+  }
+  .pg-btn:hover:not(:disabled){background:#faf7ff;border-color:var(--gold)}
+  .pg-btn.active{background:linear-gradient(135deg,var(--royal),var(--royal-2));
+    color:#fff;border-color:var(--royal);box-shadow:var(--shadow-gold)}
+  .pg-btn:disabled{opacity:.4;cursor:not-allowed}
+  .pg-ellipsis{color:var(--muted);padding:0 4px;font-weight:800}
+
+  .bulkbar{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(160%);
+    background:linear-gradient(135deg,var(--royal-3),var(--royal),var(--royal-2));
+    color:#fff;padding:12px 18px;border-radius:14px;
+    box-shadow:0 12px 40px rgba(30,19,80,.5), inset 0 0 0 2px var(--gold);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+    z-index:250;transition:.3s;max-width:95vw;
+  }
+  .bulkbar.show{transform:translateX(-50%) translateY(0)}
+  .bulkbar .count{
+    background:var(--gold);color:var(--royal-3);
+    padding:4px 12px;border-radius:999px;font-weight:900;font-size:.85rem;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+  }
+  .bulkbar .note{font-size:.78rem;opacity:.85;font-weight:700}
+  .bulkbar button{padding:8px 14px;font-size:.85rem}
+
+  .edit-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+  .edit-form .full{grid-column:1/-1}
+  .edit-form label{display:block;font-size:.8rem;font-weight:800;color:var(--muted);margin-bottom:4px}
+  .edit-form input{
+    width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:inherit;font-size:.92rem;color:var(--ink);background:#fff;transition:.15s;
+  }
+  .edit-form input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.18)}
+  .edit-form input:read-only{background:#f3f0fb;color:var(--muted);cursor:not-allowed}
+  .edit-form .hint{font-size:.72rem;color:var(--muted);margin-top:2px;font-weight:600}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(30,19,80,.55);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;padding:16px;z-index:300}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:18px;max-width:560px;width:100%;padding:24px;
+    box-shadow:0 24px 70px rgba(30,19,80,.4);animation:pop .2s ease-out;
+    border-top:4px solid var(--gold);max-height:92vh;overflow:auto}
+  @keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal h3{margin:0 0 12px;color:var(--red-2);display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:800}
+  .modal h3.gold{color:var(--gold)}
+  .modal h3.green{color:var(--green-2)}
+  .modal h3.purple{color:var(--purple)}
+  .modal p{margin:0 0 18px;color:var(--ink);font-size:.94rem}
+  .modal .actions{display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap}
+  .modal .actions button{flex:1;min-width:120px}
+  .modal ul{margin:0 0 14px;padding-right:18px;font-size:.9rem;color:var(--muted);max-height:220px;overflow:auto}
+  .modal ul li{margin-bottom:4px}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(200%);
+    background:linear-gradient(135deg,var(--royal),var(--royal-2));color:#fff;
+    padding:12px 22px;border-radius:12px;font-size:.9rem;font-weight:700;
+    transition:.3s;z-index:400;box-shadow:0 10px 30px rgba(30,19,80,.4);
+    border:1px solid rgba(201,162,39,.5);max-width:90vw;text-align:center}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  .err{background:#fef2f2;border:1px solid #fecaca;border-right:4px solid var(--red-2);
+    color:#991b1b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:.9rem}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:12px;
+    background:#fff;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);
+    border:1px solid rgba(201,162,39,.2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+  .dot{width:13px;height:13px;border-radius:4px;display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+
+  footer{
+    margin-top:28px;
+    background:linear-gradient(135deg,var(--royal-3) 0%, var(--royal) 50%, var(--royal-2) 100%);
+    color:#fff;padding:18px 20px;border-radius:16px 16px 0 0;
+    box-shadow:0 -4px 22px rgba(43,26,107,.15), inset 0 2px 0 var(--gold);
+    text-align:center;font-size:.86rem;line-height:1.9;position:relative;overflow:hidden;
+  }
+  footer::before{content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(135deg, rgba(201,162,39,.04) 0 2px, transparent 2px 14px);
+    pointer-events:none;}
+  footer > *{position:relative;z-index:1}
+  footer .copyright{font-weight:800;color:var(--gold-2);font-size:.95rem;letter-spacing:.3px;margin-bottom:6px;}
+  footer .brand{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:8px 16px;font-weight:700;color:#fff;margin-bottom:4px;}
+  footer .brand .sep{color:var(--gold);opacity:.75}
+  footer .brand .abm{color:var(--gold-2);font-weight:900;letter-spacing:.5px;}
+  footer a{color:var(--gold-2);text-decoration:none;transition:.15s;
+    border-bottom:1px dotted rgba(230,195,74,.4);}
+  footer a:hover{color:#fff;border-bottom-color:var(--gold-2)}
+  footer .author{color:#fff;font-weight:800;}
+  footer .gold-bar{height:2px;width:70px;margin:8px auto 0;border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),var(--gold-2),var(--gold),transparent);}
+
+  @media(max-width:900px){
+    header h1{font-size:1.25rem}
+    .stat .value{font-size:1.2rem}
+    .stat.alert .value{font-size:1.45rem}
+    .bulkbar{font-size:.85rem;padding:10px 14px}
+    .bulkbar button{padding:7px 10px;font-size:.8rem}
+  }
+  @media(max-width:640px){
+    body{font-size:14px}
+    .wrap{padding:12px}
+    header{padding:20px 16px;border-radius:12px}
+    header h1{font-size:1.1rem}
+    header p{font-size:.85rem}
+    .toolbar{gap:8px}
+    .toolbar button{flex:1 1 calc(50% - 4px);min-width:0;padding:10px 12px;font-size:.85rem}
+    .stats{grid-template-columns:repeat(2,1fr);gap:8px}
+    .stat{padding:11px 12px}
+    .stat .value{font-size:1.05rem}
+    .stat .label{font-size:.72rem}
+    .stat.alert .value{font-size:1.25rem}
+    .stat.alert .label{font-size:.72rem}
+    .stat.alert .icon-bg{font-size:2.6rem}
+    .table-head{padding:12px}
+    .head-tools{width:100%;justify-content:flex-start}
+    .search{max-width:100%;width:100%}
+    thead th,tbody td{padding:8px 6px;font-size:.8rem}
+    .btn-wa,.btn-edit{padding:6px 9px;font-size:.75rem}
+    .btn-wa svg,.btn-edit svg{width:14px;height:14px}
+    .modal{padding:18px;border-radius:14px}
+    .modal .actions button{flex:1 1 100%}
+    .edit-form{grid-template-columns:1fr}
+    .pager{flex-direction:column;align-items:stretch;gap:10px}
+    .pager .controls{justify-content:center}
+    .bulkbar{left:12px;right:12px;transform:translateX(0) translateY(180%);
+      justify-content:center;text-align:center}
+    .bulkbar.show{transform:translateX(0) translateY(0)}
+    .bulkbar .note{display:none}
+    .bulkbar button{flex:1 1 auto}
+    footer{font-size:.78rem;padding:16px 14px;line-height:1.9}
+    footer .copyright{font-size:.86rem}
+    footer .brand{flex-direction:column;gap:4px}
+    footer .brand .sep{display:none}
+  }
+  @media(max-width:380px){
+    .stats{grid-template-columns:1fr}
+    .toolbar button{flex:1 1 100%}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>متابعة الرسوم الدراسية — طلب السداد عبر واتساب</h1>
+    <p>ارفع ملف Excel لعرض بيانات الطلاب وإرسال رسائل لطيفة لأولياء الأمور بضغطة زر.</p>
+    <div class="gold-line"></div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn-gold" id="btnTemplate">⬇️ تنزيل قالب Excel</button>
+    <button class="btn-brand" id="btnUpload">📂 رفع ملف Excel</button>
+    <button class="btn-blue" id="btnExport" style="display:none">💾 تصدير الجدول</button>
+    <button class="btn-green" id="btnBulk" style="display:none" disabled>📤 إرسال جماعي للكل</button>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+  </div>
+
+  <div class="drop" id="dropZone">
+    <span class="icon">📊</span>
+    <strong>اسحب ملف Excel هنا</strong> أو اضغط للاختيار<br>
+    <small>الأعمدة المطلوبة: رقم الهوية — الاسم — رقم الجوال — القسم — الفصل — إجمالي الرسوم — المبلغ المدفوع — المبلغ المتبقي</small>
+  </div>
+
+  <div id="errorBox"></div>
+
+  <div class="stats" id="stats" style="display:none">
+    <div class="stat c-blue"><div class="label">👥 عدد الطلاب</div><div class="value" id="stCount">0</div></div>
+    <div class="stat c-gold"><div class="label">إجمالي الرسوم</div><div class="value" id="stGrandTotal">0</div></div>
+    <div class="stat c-teal"><div class="label">💵 إجمالي المدفوع</div><div class="value" id="stTotalPaid">0</div></div>
+    <div class="stat c-purple"><div class="label">⏳ إجمالي المتبقي</div><div class="value" id="stTotal">0</div></div>
+
+    <div class="stat alert c-red" id="cardRed">
+      <span class="icon-bg">🚨</span>
+      <div class="label">أعلى من 30 ألف</div>
+      <div class="value" id="stRed">0</div>
+      <div class="bar"><span id="barRed" style="width:0%"></span></div>
+    </div>
+    <div class="stat alert c-orange" id="cardOrange">
+      <span class="icon-bg">⚠️</span>
+      <div class="label">15 – 30 ألف</div>
+      <div class="value" id="stOrange">0</div>
+      <div class="bar"><span id="barOrange" style="width:0%"></span></div>
+    </div>
+    <div class="stat alert c-yellow" id="cardYellow">
+      <span class="icon-bg">🔔</span>
+      <div class="label">5 – 15 ألف</div>
+      <div class="value" id="stYellow">0</div>
+      <div class="bar"><span id="barYellow" style="width:0%"></span></div>
+    </div>
+    <div class="stat alert c-green" id="cardGreen">
+      <span class="icon-bg">✅</span>
+      <div class="label">أقل من 5 آلاف</div>
+      <div class="value" id="stGreen">0</div>
+      <div class="bar"><span id="barGreen" style="width:0%"></span></div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend" style="display:none">
+    <span><i class="dot" style="background:var(--red-2)"></i> 🚨 أكثر من 30,000 (حرج)</span>
+    <span><i class="dot" style="background:var(--orange-2)"></i> ⚠️ 15,000 – 30,000</span>
+    <span><i class="dot" style="background:var(--yellow-2)"></i> 🔔 5,000 – 15,000</span>
+    <span><i class="dot" style="background:var(--green-2)"></i> ✅ أقل من 5,000</span>
+    <span><i class="dot" style="background:var(--gray-2)"></i> 💯 مسدّد بالكامل</span>
+  </div>
+
+  <div class="table-card" id="tableCard" style="display:none;margin-top:16px">
+    <div class="table-head">
+      <h2>بيانات الطلاب</h2>
+      <div class="head-tools">
+        <div class="search"><input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الهوية أو الجوال…"></div>
+        <button class="reset-sort" id="btnResetSort" disabled title="إلغاء الفرز">↺ إلغاء الفرز</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr id="theadRow">
+            <th class="check-col">
+              <label class="cbx cbx-head" title="تحديد الصفحة الحالية">
+                <input type="checkbox" id="checkAll">
+                <span class="box"></span>
+              </label>
+            </th>
+            <th class="no-sort">#</th>
+            <th data-key="id">رقم الهوية<span class="sort-ind">⇅</span></th>
+            <th data-key="name">الاسم<span class="sort-ind">⇅</span></th>
+            <th data-key="phone">الجوال<span class="sort-ind">⇅</span></th>
+            <th data-key="dept">القسم<span class="sort-ind">⇅</span></th>
+            <th data-key="cls">الفصل<span class="sort-ind">⇅</span></th>
+            <th data-key="total">إجمالي الرسوم<span class="sort-ind">⇅</span></th>
+            <th data-key="paid">المدفوع<span class="sort-ind">⇅</span></th>
+            <th data-key="remain">المتبقي<span class="sort-ind">⇅</span></th>
+            <th data-key="risk">الحالة<span class="sort-ind">⇅</span></th>
+            <th class="no-sort">الإجراء</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="pager" id="pager">
+      <div class="info" id="pagerInfo">—</div>
+      <div class="controls">
+        <label style="font-size:.8rem;color:var(--muted);font-weight:700">حجم الصفحة:</label>
+        <select id="pageSize">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="all">الكل</option>
+        </select>
+        <button class="pg-btn" id="pgPrev" title="السابق">‹</button>
+        <span id="pgNums" style="display:flex;gap:6px"></span>
+        <button class="pg-btn" id="pgNext" title="التالي">›</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bulkbar" id="bulkBar">
+  <span class="count" id="selCount">0</span>
+  <span class="note">محدد</span>
+  <button class="btn-green" id="btnBulkSel">📤 إرسال للمحدد</button>
+  <button class="btn-red" id="btnDeleteSel">🗑️ حذف المحدد</button>
+  <button class="btn-ghost" id="btnClearSel">✖ إلغاء</button>
+</div>
+
+<footer>
+  <div class="copyright">© جميع الحقوق محفوظة</div>
+  <div class="brand">
+    <span class="abm">ABM_Dev Systems</span>
+    <span class="sep">|</span>
+    <a href="mailto:abm9966@gmail.com">abm9966@gmail.com</a>
+    <span class="sep">|</span>
+    <span class="author">MR/ Ahmed Bahman Mohamed</span>
+  </div>
+  <div class="gold-bar"></div>
+</footer>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle">⚠️ تنبيه</h3>
+    <div id="modalBody"><p id="modalMsg"></p></div>
+    <div class="actions" id="modalActions">
+      <button class="btn-brand" id="modalConfirm">متابعة</button>
+      <button class="btn-ghost" id="modalCancel">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================================================================
+   أدوات مساعدة
+   ================================================================= */
+const AR = new Intl.NumberFormat('en-US');
+const fmt = n => AR.format(Math.round(Number(n)||0));
+const norm = s => String(s??'').trim().replace(/\s+/g,' ');
+
+function toNum(v){
+  if (v == null || v === '') return 0;
+  const n = Number(
+    String(v).replace(/[,٬\s]/g,'').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+  );
+  return isNaN(n) ? 0 : n;
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._id);
+  t._id = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+function showError(msg){
+  document.getElementById('errorBox').innerHTML = msg ? `<div class="err">${msg}</div>` : '';
+}
+
+/* =================================================================
+   الحالة العامة
+   ================================================================= */
+let ROWS = [];
+let VIEW = [];
+let PAGE = 1;
+let PAGE_SIZE = 50;
+let SORT = { key: null, dir: 1 };
+let _uidCounter = 1;
+
+const SELECTED = new Set();
+const SENT     = new Set();
+
+/* =================================================================
+   القالب
+   ================================================================= */
+document.getElementById('btnTemplate').addEventListener('click', () => {
+  const headers = ['رقم الهوية','الاسم','رقم الجوال','القسم','الفصل','إجمالي الرسوم','المبلغ المدفوع','المبلغ المتبقي'];
+  const sample = [['1234567890','أحمد محمد العتيبي','0555123456','الابتدائي','الصف الأول أ',35000,10000,25000]];
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...sample]);
+  ws['!cols'] = headers.map((h,i)=> ({wch: i===1?26:18}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'الرسوم');
+  XLSX.writeFile(wb, 'قالب_الرسوم.xlsx');
+  toast('تم تنزيل القالب بنجاح');
+});
+
+/* =================================================================
+   رفع الملف
+   ================================================================= */
+const dropZone  = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+document.getElementById('btnUpload').addEventListener('click', ()=> fileInput.click());
+dropZone.addEventListener('click', ()=> fileInput.click());
+dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('hover'); });
+dropZone.addEventListener('dragleave', ()=> dropZone.classList.remove('hover'));
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault(); dropZone.classList.remove('hover');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e=>{
+  if (e.target.files.length) handleFile(e.target.files[0]);
+});
+
+const COLUMN_ALIASES = {
+  id:     ['رقم الهوية','الهوية','رقم الهويه','هوية'],
+  name:   ['الاسم','اسم الطالب','اسم'],
+  phone:  ['رقم الجوال','الجوال','جوال','الهاتف','رقم الهاتف'],
+  dept:   ['القسم','المرحلة','قسم'],
+  cls:    ['الفصل','الصف','فصل'],
+  total:  ['إجمالي الرسوم','اجمالي الرسوم','الرسوم','إجمالي'],
+  paid:   ['المبلغ المدفوع','المدفوع','مدفوع'],
+  remain: ['المبلغ المتبقي','المتبقي','باقي','المتبقى']
+};
+
+function pickKey(obj, aliases){
+  for (const k of Object.keys(obj)){
+    const nk = norm(k).replace(/[إأآ]/g,'ا').replace(/ى/g,'ي');
+    for (const a of aliases){
+      const na = norm(a).replace(/[إأآ]/g,'ا').replace(/ى/g,'ي');
+      if (nk === na || nk.includes(na)) return k;
+    }
+  }
+  return null;
+}
+
+function handleFile(file){
+  showError('');
+  if (!/\.(xlsx|xls)$/i.test(file.name)){
+    showError('صيغة الملف غير مدعومة. استخدم xlsx أو xls.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const wb  = XLSX.read(ev.target.result, {type:'array'});
+      const ws  = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, {defval:''});
+      if (!raw.length){ showError('الملف لا يحتوي بيانات.'); return; }
+
+      const first = raw[0];
+      const keys = {
+        id:     pickKey(first, COLUMN_ALIASES.id),
+        name:   pickKey(first, COLUMN_ALIASES.name),
+        phone:  pickKey(first, COLUMN_ALIASES.phone),
+        dept:   pickKey(first, COLUMN_ALIASES.dept),
+        cls:    pickKey(first, COLUMN_ALIASES.cls),
+        total:  pickKey(first, COLUMN_ALIASES.total),
+        paid:   pickKey(first, COLUMN_ALIASES.paid),
+        remain: pickKey(first, COLUMN_ALIASES.remain),
+      };
+      const missing = Object.entries(keys).filter(([,v])=>!v).map(([k])=>k);
+      if (missing.length){
+        showError('لم يتم العثور على الأعمدة التالية: ' + missing.join(', ') +
+                  '. يرجى استخدام القالب الرسمي.');
+        return;
+      }
+
+      _uidCounter = 1;
+      ROWS = raw.map(r => ({
+        _uid:   _uidCounter++,
+        id:     norm(r[keys.id]),
+        name:   norm(r[keys.name]),
+        phone:  norm(r[keys.phone]),
+        dept:   norm(r[keys.dept]),
+        cls:    norm(r[keys.cls]),
+        total:  toNum(r[keys.total]),
+        paid:   toNum(r[keys.paid]),
+        remain: toNum(r[keys.remain]),
+      })).filter(r => r.name || r.id);
+
+      SELECTED.clear();
+      SENT.clear();
+      SORT = { key: null, dir: 1 };
+      PAGE = 1;
+      updateSortIndicators();
+
+      showAllSections();
+      buildStats();
+      recomputeView();
+      toast('تم تحميل البيانات: ' + ROWS.length + ' طالب');
+    } catch(err){
+      console.error(err);
+      showError('تعذر قراءة الملف. تأكد أنه ملف Excel صالح.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function showAllSections(){
+  document.getElementById('stats').style.display      = 'grid';
+  document.getElementById('legend').style.display     = 'flex';
+  document.getElementById('tableCard').style.display  = 'block';
+  document.getElementById('btnExport').style.display  = 'inline-block';
+  document.getElementById('btnBulk').style.display    = 'inline-block';
+}
+
+/* =================================================================
+   تصنيف الخطورة
+   ================================================================= */
+function riskOf(remain){
+  if (remain <= 0)      return 'gray';
+  if (remain > 30000)   return 'red';
+  if (remain >= 15000)  return 'orange';
+  if (remain >= 5000)   return 'yellow';
+  return 'green';
+}
+const RISK_WEIGHT = { gray:0, green:1, yellow:2, orange:3, red:4 };
+
+/* =================================================================
+   رسالة واتساب
+   ================================================================= */
+function buildMessage(r, risk){
+  const today = new Date().toLocaleDateString('ar-SA-u-nu-latn', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric'
+  });
+  const nameLine = `ولي أمر الطالب الكريم: *${r.name}* — حفظه الله`;
+  const base = `السلام عليكم ورحمة الله وبركاته 🌷\n\n${nameLine}\n\n`;
+
+  let note = '';
+  if (risk === 'red')    note = `\n🚨 *ملاحظة مهمة* 🚨\nالمبلغ يتطلب مراجعة إدارية.\n💡 *نقترح ترتيب خطة سداد مناسبة عبر التواصل مع الإدارة.*\n`;
+  if (risk === 'orange') note = `\n⚠️ 💡 *نقترح ترتيب سداد على دفعات إن رغبتم.*\n`;
+  if (risk === 'yellow') note = `\n🔔 🌿 *بقليل من التعاون نصل للسداد الكامل بإذن الله.*\n`;
+  if (risk === 'green')  note = `\n✅ 🌟 *تبقّى القليل جداً — شكراً لالتزامكم.*\n`;
+
+  const details =
+    `📚 القسم: ${r.dept || '—'}\n` +
+    `🏫 الفصل: ${r.cls || '—'}\n` +
+    `💰 إجمالي الرسوم: ${fmt(r.total)} ريال\n` +
+    `✅ المدفوع: ${fmt(r.paid)} ريال\n` +
+    `📌 *المتبقي: ${fmt(r.remain)} ريال*\n` +
+    note + `\n`;
+
+  const intros = {
+    red:    `نود لفت عنايتكم إلى أن المبلغ المتبقي على حساب ابنكم/ابنتكم بلغ مبلغاً مرتفعاً، ونأمل منكم التكرم بمراجعته وسداده في أقرب وقت.\n\n`,
+    orange: `نتواصل معكم بخصوص الرسوم الدراسية لابنكم/ابنتكم، ونود تذكيركم بسداد المبلغ المتبقي في أقرب وقت ممكن.\n\n`,
+    yellow: `نشكر لكم اهتمامكم المستمر، ونود تذكيركم بسداد المبلغ المتبقي على حساب ابنكم/ابنتكم.\n\n`,
+    green:  `نشكر لكم التزامكم الكريم، ونود التنبيه إلى وجود مبلغ بسيط متبقٍ على حساب ابنكم/ابنتكم.\n\n`,
+    gray:   `نشكركم على سدادكم الكامل، بارك الله فيكم.\n\n`
+  };
+
+  const footer =
+    `نحن دائماً في خدمتكم.\n\n` +
+    `شكراً جزيلاً لتعاونكم، ونسأل الله أن يبارك في أبنائكم ويسدد خطاهم 🌟\n\n` +
+    `🗓️ ${today}`;
+
+  return base + intros[risk] + details + footer;
+}
+
+function phoneToIntl(phone){
+  let p = String(phone).replace(/[^\d+]/g,'');
+  if (!p) return '';
+  if (p.startsWith('+'))  p = p.slice(1);
+  if (p.startsWith('00')) p = p.slice(2);
+  if (p.startsWith('966')) return p;
+  if (p.startsWith('0'))   return '966' + p.slice(1);
+  if (p.length === 9 && p.startsWith('5')) return '966' + p;
+  return p;
+}
+
+/* =================================================================
+   البطاقات الإحصائية
+   ================================================================= */
+function buildStats(){
+  const stats = {
+    count: ROWS.length, grandTotal: 0, totalPaid: 0, total: 0,
+    red:0, orange:0, yellow:0, green:0, gray:0
+  };
+  ROWS.forEach(r => {
+    stats.grandTotal += r.total;
+    stats.totalPaid  += r.paid;
+    stats.total      += r.remain;
+    stats[riskOf(r.remain)]++;
+  });
+
+  const totalForBars = stats.red + stats.orange + stats.yellow + stats.green || 1;
+
+  document.getElementById('stCount').textContent      = fmt(stats.count);
+  document.getElementById('stGrandTotal').textContent = fmt(stats.grandTotal) + ' ر.س';
+  document.getElementById('stTotalPaid').textContent  = fmt(stats.totalPaid)  + ' ر.س';
+  document.getElementById('stTotal').textContent      = fmt(stats.total)      + ' ر.س';
+  document.getElementById('stRed').textContent    = fmt(stats.red);
+  document.getElementById('stOrange').textContent = fmt(stats.orange);
+  document.getElementById('stYellow').textContent = fmt(stats.yellow);
+  document.getElementById('stGreen').textContent  = fmt(stats.green);
+
+  document.getElementById('barRed').style.width    = ((stats.red    / totalForBars) * 100) + '%';
+  document.getElementById('barOrange').style.width = ((stats.orange / totalForBars) * 100) + '%';
+  document.getElementById('barYellow').style.width = ((stats.yellow / totalForBars) * 100) + '%';
+  document.getElementById('barGreen').style.width  = ((stats.green  / totalForBars) * 100) + '%';
+
+  const cardRed = document.getElementById('cardRed');
+  if (stats.red > 0) cardRed.classList.add('pulse');
+  else cardRed.classList.remove('pulse');
+
+  const bulkBtn = document.getElementById('btnBulk');
+  bulkBtn.disabled = !ROWS.some(r => riskOf(r.remain) !== 'gray' && phoneToIntl(r.phone));
+}
+
+/* =================================================================
+   الفرز + البحث + الترقيم
+   ================================================================= */
+function recomputeView(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  VIEW = ROWS.filter(r => {
+    if (!q) return true;
+    const hay = (r.name + ' ' + r.id + ' ' + r.phone + ' ' + r.dept + ' ' + r.cls).toLowerCase();
+    return hay.includes(q);
+  });
+
+  if (SORT.key){
+    const k = SORT.key, d = SORT.dir;
+    VIEW.sort((a,b)=>{
+      let va, vb;
+      if (k === 'risk'){
+        va = RISK_WEIGHT[riskOf(a.remain)];
+        vb = RISK_WEIGHT[riskOf(b.remain)];
+      } else if (['total','paid','remain'].includes(k)){
+        va = a[k]; vb = b[k];
+      } else {
+        va = String(a[k] || '').toLowerCase();
+        vb = String(b[k] || '').toLowerCase();
+      }
+      if (va < vb) return -1*d;
+      if (va > vb) return  1*d;
+      return 0;
+    });
+  }
+
+  const totalPages = getTotalPages();
+  if (PAGE > totalPages) PAGE = totalPages;
+  if (PAGE < 1) PAGE = 1;
+
+  renderPage();
+  renderPager();
+  updateBulkBar();
+  updateCheckAllState();
+}
+
+function getPageSize(){
+  if (PAGE_SIZE === 'all') return VIEW.length || 1;
+  return PAGE_SIZE;
+}
+function getTotalPages(){
+  const size = getPageSize();
+  return Math.max(1, Math.ceil(VIEW.length / size));
+}
+function getPageSlice(){
+  if (PAGE_SIZE === 'all') return VIEW.slice();
+  const size = PAGE_SIZE;
+  const start = (PAGE - 1) * size;
+  return VIEW.slice(start, start + size);
+}
+
+function renderPage(){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  const slice = getPageSlice();
+
+  slice.forEach((r) => {
+    const risk = riskOf(r.remain);
+    const key  = r._uid;
+    const isSent = SENT.has(key);
+    const isSel  = SELECTED.has(key);
+    const globalIdx = VIEW.indexOf(r) + 1;
+
+    const tr = document.createElement('tr');
+    tr.className = 'risk-' + risk + (isSent ? ' sent' : '') + (isSel ? ' selected' : '');
+    tr.dataset.uid = key;
+
+    const waDisabled = risk === 'gray' || !phoneToIntl(r.phone);
+    const statusText = risk === 'gray' ? 'مسدّد' : 'طلب سداد';
+
+    tr.innerHTML = `
+      <td class="check-col">
+        <label class="cbx">
+          <input type="checkbox" class="row-check" data-uid="${key}" ${isSel?'checked':''}>
+          <span class="box"></span>
+        </label>
+      </td>
+      <td>${globalIdx}</td>
+      <td>${r.id || '—'}</td>
+      <td><strong>${r.name || '—'}</strong></td>
+      <td dir="ltr" style="text-align:right">${r.phone || '—'}</td>
+      <td>${r.dept || '—'}</td>
+      <td>${r.cls || '—'}</td>
+      <td class="money">${fmt(r.total)}</td>
+      <td class="money">${fmt(r.paid)}</td>
+      <td class="money">${fmt(r.remain)}</td>
+      <td><span class="badge ${risk}">${statusText}</span></td>
+      <td></td>
+    `;
+
+    const actCell = tr.lastElementChild;
+    actCell.classList.add('actions-cell');
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-edit';
+    editBtn.title = 'تعديل بيانات الطالب';
+    editBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+    editBtn.addEventListener('click', () => openEdit(r));
+    actCell.appendChild(editBtn);
+
+    const waBtn = document.createElement('button');
+    waBtn.className = 'btn-wa ' + (waDisabled ? 'gray' : risk) + (isSent ? ' sent' : '');
+    const label = risk==='gray' ? 'مسدّد' : (isSent ? 'أُرسلت ✓' : 'واتساب');
+    waBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20.5 3.5A11 11 0 0 0 3.4 17L2 22l5.2-1.4A11 11 0 1 0 20.5 3.5zM12 20a8 8 0 0 1-4-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.5-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7 1-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3A3 3 0 0 0 7.7 10a5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4 5.3 5.3 0 0 0 2.6.5 2.3 2.3 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c0-.1-.2-.2-.4-.3z"/></svg> ${label}`;
+
+    if (waDisabled){
+      waBtn.disabled = true;
+      waBtn.title = risk === 'gray' ? 'تم السداد بالكامل' : 'رقم الجوال مفقود';
+    } else {
+      waBtn.addEventListener('click', () => openWhatsApp(r, risk));
+    }
+    actCell.appendChild(waBtn);
+
+    tr.querySelector('.row-check').addEventListener('change', (e) => {
+      if (e.target.checked) SELECTED.add(key);
+      else SELECTED.delete(key);
+      tr.classList.toggle('selected', e.target.checked);
+      updateBulkBar();
+      updateCheckAllState();
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  if (!slice.length){
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted)">
+      لا توجد بيانات مطابقة</td></tr>`;
+  }
+}
+
+function renderPager(){
+  const total = VIEW.length;
+  const size  = getPageSize();
+  const totalPages = getTotalPages();
+  const start = total ? (PAGE - 1) * (PAGE_SIZE === 'all' ? total : size) + 1 : 0;
+  const end   = PAGE_SIZE === 'all' ? total : Math.min(total, PAGE * size);
+
+  document.getElementById('pagerInfo').textContent =
+    total ? `عرض ${start} – ${end} من ${total} طالب` : 'لا توجد بيانات';
+
+  document.getElementById('pgPrev').disabled = PAGE <= 1;
+  document.getElementById('pgNext').disabled = PAGE >= totalPages;
+
+  const nums = document.getElementById('pgNums');
+  nums.innerHTML = '';
+  const pages = [];
+  const maxButtons = 7;
+
+  if (totalPages <= maxButtons){
+    for (let i=1;i<=totalPages;i++) pages.push(i);
+  } else {
+    pages.push(1);
+    let from = Math.max(2, PAGE - 2);
+    let to   = Math.min(totalPages - 1, PAGE + 2);
+    if (from > 2) pages.push('…');
+    for (let i=from;i<=to;i++) pages.push(i);
+    if (to < totalPages - 1) pages.push('…');
+    pages.push(totalPages);
+  }
+
+  pages.forEach(p => {
+    if (p === '…'){
+      const s = document.createElement('span');
+      s.className = 'pg-ellipsis';
+      s.textContent = '…';
+      nums.appendChild(s);
+    } else {
+      const b = document.createElement('button');
+      b.className = 'pg-btn' + (p === PAGE ? ' active' : '');
+      b.textContent = p;
+      b.addEventListener('click', () => {
+        PAGE = p;
+        renderPage();
+        renderPager();
+        updateCheckAllState();
+      });
+      nums.appendChild(b);
+    }
+  });
+}
+
+document.getElementById('pgPrev').addEventListener('click', () => {
+  if (PAGE > 1){ PAGE--; renderPage(); renderPager(); updateCheckAllState(); }
+});
+document.getElementById('pgNext').addEventListener('click', () => {
+  if (PAGE < getTotalPages()){ PAGE++; renderPage(); renderPager(); updateCheckAllState(); }
+});
+document.getElementById('pageSize').addEventListener('change', (e) => {
+  const v = e.target.value;
+  PAGE_SIZE = v === 'all' ? 'all' : Number(v);
+  PAGE = 1;
+  renderPage();
+  renderPager();
+  updateCheckAllState();
+});
+
+/* =================================================================
+   الفرز
+   ================================================================= */
+document.querySelectorAll('#theadRow th[data-key]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.key;
+    if (SORT.key === key) SORT.dir *= -1;
+    else { SORT.key = key; SORT.dir = 1; }
+    updateSortIndicators();
+    document.getElementById('btnResetSort').disabled = false;
+    PAGE = 1;
+    recomputeView();
+  });
+});
+
+function updateSortIndicators(){
+  document.querySelectorAll('#theadRow th').forEach(th => {
+    th.classList.remove('sorted-asc','sorted-desc');
+    const ind = th.querySelector('.sort-ind');
+    if (ind) ind.textContent = '⇅';
+  });
+  if (!SORT.key) return;
+  const active = document.querySelector(`#theadRow th[data-key="${SORT.key}"]`);
+  if (!active) return;
+  active.classList.add(SORT.dir === 1 ? 'sorted-asc' : 'sorted-desc');
+  const ind = active.querySelector('.sort-ind');
+  if (ind) ind.textContent = SORT.dir === 1 ? '▲' : '▼';
+}
+
+document.getElementById('btnResetSort').addEventListener('click', () => {
+  SORT = { key: null, dir: 1 };
+  updateSortIndicators();
+  document.getElementById('btnResetSort').disabled = true;
+  PAGE = 1;
+  recomputeView();
+  toast('تم إلغاء الفرز');
+});
+
+/* =================================================================
+   البحث
+   ================================================================= */
+document.getElementById('searchInput').addEventListener('input', () => {
+  PAGE = 1;
+  recomputeView();
+});
+
+/* =================================================================
+   تحديد الكل (الصفحة الحالية فقط)
+   ================================================================= */
+document.getElementById('checkAll').addEventListener('change', (e) => {
+  const checked = e.target.checked;
+  const slice = getPageSlice();
+  slice.forEach(r => {
+    if (checked) SELECTED.add(r._uid);
+    else SELECTED.delete(r._uid);
+  });
+  document.querySelectorAll('#tbody .row-check').forEach(cb => {
+    const uid = Number(cb.dataset.uid);
+    const inPage = slice.some(r => r._uid === uid);
+    if (inPage){
+      cb.checked = checked;
+      cb.closest('tr').classList.toggle('selected', checked);
+    }
+  });
+  updateBulkBar();
+  updateCheckAllState();
+});
+
+function updateCheckAllState(){
+  const all = document.getElementById('checkAll');
+  const slice = getPageSlice();
+  const total = slice.length;
+  const selCount = slice.filter(r => SELECTED.has(r._uid)).length;
+
+  all.checked = total > 0 && selCount === total;
+  all.indeterminate = selCount > 0 && selCount < total;
+}
+
+/* =================================================================
+   الشريط العائم
+   ================================================================= */
+function updateBulkBar(){
+  const bar = document.getElementById('bulkBar');
+  const n = SELECTED.size;
+  document.getElementById('selCount').textContent = n;
+  bar.classList.toggle('show', n > 0);
+}
+
+document.getElementById('btnClearSel').addEventListener('click', () => {
+  SELECTED.clear();
+  document.querySelectorAll('#tbody .row-check').forEach(cb => {
+    cb.checked = false;
+    cb.closest('tr').classList.remove('selected');
+  });
+  updateBulkBar();
+  updateCheckAllState();
+});
+
+/* =================================================================
+   الحذف
+   ================================================================= */
+document.getElementById('btnDeleteSel').addEventListener('click', () => {
+  if (!SELECTED.size){ toast('لا يوجد صفوف محددة'); return; }
+  const selectedRows = ROWS.filter(r => SELECTED.has(r._uid));
+  const names = selectedRows.slice(0, 10).map(r => `• ${r.name || 'بدون اسم'}`).join('<br>');
+  const extra = selectedRows.length > 10 ? `<br>… و ${selectedRows.length - 10} آخرون` : '';
+
+  document.getElementById('modalTitle').textContent = '🗑️ تأكيد الحذف';
+  document.getElementById('modalTitle').className   = '';
+  document.getElementById('modalBody').innerHTML = `
+    <p>هل تريد حذف <strong>${selectedRows.length}</strong> طالب من الجدول؟<br>
+    <small style="color:var(--muted)">(لن يُحذف من ملف Excel الأصلي — يمكنك إعادة رفعه للاسترجاع)</small></p>
+    <div style="max-height:180px;overflow:auto;background:#faf7ff;padding:10px;border-radius:8px;font-size:.88rem">
+      ${names}${extra}
+    </div>
+  `;
+  document.getElementById('modalActions').innerHTML = `
+    <button class="btn-red" id="modalConfirm">نعم، احذف</button>
+    <button class="btn-ghost" id="modalCancel">إلغاء</button>`;
+  bindModal(() => {
+    ROWS = ROWS.filter(r => !SELECTED.has(r._uid));
+    SELECTED.forEach(uid => SENT.delete(uid));
+    SELECTED.clear();
+    PAGE = 1;
+    buildStats();
+    recomputeView();
+    toast('تم حذف الصفوف المحددة');
+  });
+  document.getElementById('modal').classList.add('show');
+});
+
+/* =================================================================
+   الإرسال الجماعي
+   ================================================================= */
+function bulkSend(targets, label){
+  if (!targets.length){ toast('لا توجد أرقام صالحة للإرسال'); return; }
+
+  const colorMap = {red:'#dc2626', orange:'#ea580c', yellow:'#ca8a04', green:'#16a34a'};
+  const listHTML = targets.map(r => {
+    const risk = riskOf(r.remain);
+    const sentMark = SENT.has(r._uid) ? ' <span style="color:#15803d;font-weight:900">✓</span>' : '';
+    return `<li><span style="color:${colorMap[risk]};font-weight:800">●</span> ${r.name} — ${fmt(r.remain)} ريال${sentMark}</li>`;
+  }).join('');
+
+  document.getElementById('modalTitle').textContent = label;
+  document.getElementById('modalTitle').className   = 'gold';
+  document.getElementById('modalBody').innerHTML = `
+    <p>سيتم فتح <strong>${targets.length}</strong> محادثة واتساب في تبويبات منفصلة (اسمح بالنوافذ المنبثقة).</p>
+    <p style="color:var(--muted);font-size:.85rem">قائمة المستهدفين:</p>
+    <ul>${listHTML}</ul>
+  `;
+  document.getElementById('modalActions').innerHTML = `
+    <button class="btn-green" id="modalConfirm">🚀 فتح جميع المحادثات</button>
+    <button class="btn-ghost" id="modalCancel">إلغاء</button>`;
+  bindModal(() => {
+    targets.forEach((r, idx) => {
+      setTimeout(() => {
+        const risk = riskOf(r.remain);
+        const url = `https://wa.me/${phoneToIntl(r.phone)}?text=${encodeURIComponent(buildMessage(r, risk))}`;
+        window.open(url, '_blank');
+        markSent(r._uid);
+      }, idx * 400);
+    });
+    toast(`جارٍ فتح ${targets.length} محادثة — سيتم تمييزها ✓`);
+    if (label.includes('المحدد')){
+      SELECTED.clear();
+      updateBulkBar();
+      updateCheckAllState();
+    }
+  });
+  document.getElementById('modal').classList.add('show');
+}
+
+document.getElementById('btnBulk').addEventListener('click', () => {
+  const targets = VIEW.filter(r => riskOf(r.remain) !== 'gray' && phoneToIntl(r.phone));
+  bulkSend(targets, '📤 الإرسال الجماعي للكل');
+});
+
+document.getElementById('btnBulkSel').addEventListener('click', () => {
+  const targets = ROWS.filter(r => SELECTED.has(r._uid) && riskOf(r.remain) !== 'gray' && phoneToIntl(r.phone));
+  if (!targets.length){ toast('لا يوجد محددون بأرقام صالحة'); return; }
+  bulkSend(targets, '📤 إرسال للمحدد');
+});
+
+/* =================================================================
+   واتساب فردي
+   ================================================================= */
+let pending = null;
+
+function openWhatsApp(r, risk){
+  const phone = phoneToIntl(r.phone);
+  if (!phone){ toast('رقم الجوال مفقود أو غير صالح'); return; }
+  const msg = buildMessage(r, risk);
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+
+  if (risk === 'red'){
+    pending = { url, uid: r._uid };
+    document.getElementById('modalTitle').textContent = '⚠️ تنبيه: مبلغ مرتفع';
+    document.getElementById('modalTitle').className   = '';
+    document.getElementById('modalBody').innerHTML =
+      `<p>المبلغ المتبقي للطالب "<strong>${r.name}</strong>" هو <strong>${fmt(r.remain)} ريال</strong>، وهو يتجاوز 30,000 ريال. يُنصح بمراجعة الإدارة قبل إرسال الطلب. هل تريد المتابعة؟</p>`;
+    document.getElementById('modalActions').innerHTML =
+      `<button class="btn-brand" id="modalConfirm">متابعة فتح واتساب</button>
+       <button class="btn-ghost" id="modalCancel">إلغاء</button>`;
+    bindModal();
+    document.getElementById('modal').classList.add('show');
+  } else {
+    window.open(url, '_blank');
+    markSent(r._uid);
+    toast('تم فتح واتساب — تم تمييز الطالب ✓');
+  }
+}
+
+/* =================================================================
+   تمييز "أُرسل"
+   ================================================================= */
+function markSent(uid){
+  SENT.add(uid);
+  const tr = document.querySelector(`#tbody tr[data-uid="${uid}"]`);
+  if (!tr) return;
+  tr.classList.add('sent');
+  const waBtn = tr.querySelector('.btn-wa');
+  if (waBtn && !waBtn.classList.contains('gray')){
+    waBtn.classList.add('sent');
+    const svg = waBtn.querySelector('svg');
+    waBtn.innerHTML = '';
+    if (svg) waBtn.appendChild(svg);
+    waBtn.appendChild(document.createTextNode(' أُرسلت ✓'));
+  }
+}
+
+/* =================================================================
+   تعديل الطالب
+   ================================================================= */
+function openEdit(r){
+  document.getElementById('modalTitle').textContent = '✏️ تعديل بيانات الطالب';
+  document.getElementById('modalTitle').className   = 'purple';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="edit-form">
+      <div class="full">
+        <label>رقم الهوية (غير قابل للتعديل)</label>
+        <input type="text" id="ed_id" value="${r.id}" readonly>
+      </div>
+      <div class="full">
+        <label>الاسم (غير قابل للتعديل)</label>
+        <input type="text" id="ed_name" value="${r.name}" readonly>
+      </div>
+      <div>
+        <label>رقم الجوال</label>
+        <input type="text" id="ed_phone" value="${r.phone}" placeholder="05xxxxxxxx" dir="ltr">
+      </div>
+      <div>
+        <label>القسم</label>
+        <input type="text" id="ed_dept" value="${r.dept}">
+      </div>
+      <div>
+        <label>الفصل</label>
+        <input type="text" id="ed_cls" value="${r.cls}">
+      </div>
+      <div>
+        <label>إجمالي الرسوم</label>
+        <input type="number" id="ed_total" value="${r.total}" min="0" step="1">
+      </div>
+      <div>
+        <label>المبلغ المدفوع</label>
+        <input type="number" id="ed_paid" value="${r.paid}" min="0" step="1">
+      </div>
+      <div>
+        <label>المبلغ المتبقي</label>
+        <input type="number" id="ed_remain" value="${r.remain}" min="0" step="1">
+        <div class="hint">يُحسب تلقائياً = الإجمالي − المدفوع</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalActions').innerHTML = `
+    <button class="btn-green" id="modalConfirm">💾 حفظ التعديلات</button>
+    <button class="btn-ghost" id="modalCancel">إلغاء</button>`;
+
+  const t = document.getElementById('ed_total');
+  const p = document.getElementById('ed_paid');
+  const rm = document.getElementById('ed_remain');
+  function syncRemain(){ rm.value = Math.max(0, toNum(t.value) - toNum(p.value)); }
+  t.addEventListener('input', syncRemain);
+  p.addEventListener('input', syncRemain);
+
+  bindModal(() => {
+    r.phone  = norm(document.getElementById('ed_phone').value);
+    r.dept   = norm(document.getElementById('ed_dept').value);
+    r.cls    = norm(document.getElementById('ed_cls').value);
+    r.total  = toNum(document.getElementById('ed_total').value);
+    r.paid   = toNum(document.getElementById('ed_paid').value);
+    r.remain = toNum(document.getElementById('ed_remain').value);
+    buildStats();
+    recomputeView();
+    toast('تم تحديث بيانات الطالب ✓');
+  });
+  document.getElementById('modal').classList.add('show');
+}
+
+/* =================================================================
+   ربط أزرار النافذة
+   ================================================================= */
+function bindModal(onConfirm){
+  document.getElementById('modalCancel').onclick = () => {
+    document.getElementById('modal').classList.remove('show');
+    pending = null;
+  };
+  document.getElementById('modalConfirm').onclick = () => {
+    document.getElementById('modal').classList.remove('show');
+    if (onConfirm) onConfirm();
+    else if (pending) {
+      window.open(pending.url, '_blank');
+      markSent(pending.uid);
+      toast('تم فتح واتساب — تم تمييز الطالب ✓');
+    }
+    pending = null;
+  };
+}
+
+/* =================================================================
+   تصدير Excel
+   ================================================================= */
+document.getElementById('btnExport').addEventListener('click', () => {
+  if (!VIEW.length){ toast('لا توجد بيانات'); return; }
+  const headers = ['رقم الهوية','الاسم','رقم الجوال','القسم','الفصل',
+                   'إجمالي الرسوم','المبلغ المدفوع','المبلغ المتبقي','الحالة','تم الإرسال'];
+  const data = VIEW.map(r => [
+    r.id, r.name, r.phone, r.dept, r.cls, r.total, r.paid, r.remain, riskOf(r.remain),
+    SENT.has(r._uid) ? 'نعم' : 'لا'
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+  ws['!cols'] = headers.map(()=> ({wch:16}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_jsheet(wb, ws, 'بيانات_الرسوم');
+  XLSX.writeFile(wb, 'تصدير_الرسوم.xlsx');
+  toast('تم تصدير الملف');
+});
+</script>
+</body>
+</html>
